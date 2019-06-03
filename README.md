@@ -59,6 +59,27 @@ values isn't 0% or 100%, that some (but not _all_) records are empty, etc
 * Syntactic validity is covered by some of the above, as well as checking
 for type conversion errors (e.g. `NaN` strings, zero-value Epoch timestamps)
 
+### Generic data property assertions
+|Assertion Key|Definition|
+|-------------|----------|
+|all_empty|All rows of column are empty|
+|all_time_in_past|All date/time/timestamp values in the column are less than the time at which the test is run.|
+|fewer_post_transform|There are less tuples in the destination database than in the source data|
+|distinct_greater_than_one|There are at least two distinct values|
+|distinct_less_than_count|Not every value is distinct|
+|no_empty_rows|There are no empty or null values in a text column|
+|no_nans|No non-numeric values in a nominally numeric source column are converted to string representations of a non-numeric value ('NaN')|
+|no_null_rows|There are no null values in a non-text column|
+|no_zero_epoch_time|None of the values in a timestamp column are equal to a zero epoch time value|
+|nonzero_sum|The sum of a numeric column is greater than zero|
+|not_numeric|None of the values in a text column are comprised of only the digits 0-9|
+|reasonably_distributed_lengths|The maximum and minimum lengths of values in a text column are at least one standard deviation away from the mean|
+|reasonably_distributed_values|The maximum and minimum values of a numeric column are at least one standard deviation away from the mean|
+some_empty_rows|At least one, but not all values in the column are null|
+|varied_lengths|Maximum and minimum lengths of values in a text column are neither equal nor zero|
+|varied_times|Maximum and minimum timestamp values are not equal|
+|varied_values|Maximum and minimum values are neither equal nor zero|
+
 I wrote a couple SQL queries that would test these properties in the abstract,
 and coupled them with an "assertion" file for a task, which mapped one or more
 of those queries to each column. For example:
@@ -88,8 +109,8 @@ task_name:
 
 ```
 
-Then, use PyTest's parameterization functions to fetch the assertions file,
-the query templates, shuffle them together into a set of valid SQL queries,
+Then, use PyTest's parameterization functions to fetch the assertions file
+and the query templates, shuffle them together into a set of valid SQL queries,
 and let PyTest run all of them.
 
 **Generate tests**
