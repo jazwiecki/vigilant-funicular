@@ -217,5 +217,5 @@ in any language with decent testing support.
 
 ## What's with the repo name?
 
-GitHubt suggested it and I thought sure, that sounds fun.
+GitHub suggested it and I thought sure, that sounds fun.
 
