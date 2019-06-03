@@ -1,0 +1,9 @@
+# _format_
+# task_name:
+#   source: NameOfSourceLuigiTask
+#   destination: table_name_in_destination (OPTIONAL)
+#   columns:
+#     - column_name:
+#         - assertion_template_key
+#         - another_template_key
+#     - another_column: (etc)

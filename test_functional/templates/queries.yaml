@@ -1,0 +1,115 @@
+all_empty: >
+  SELECT CASE WHEN
+                  count(*) = 0
+  THEN 1 ELSE 0 END
+  FROM $table
+  WHERE $table.$column is NOT NULL AND $table.$column <> ''
+all_time_in_past: >
+  SELECT CASE WHEN
+                  COUNT(*) = 0
+  THEN 1 ELSE 0 END
+  FROM $table
+  WHERE $table.$column > current_timestamp
+fewer_post_transform: >
+  SELECT CASE WHEN
+                  (0 < count($table.$column)) AND
+                  (count($table.$column) < $source_row_count)
+  THEN 1 ELSE 0 END
+  FROM $table
+distinct_greater_than_one: >
+  SELECT CASE WHEN
+                  (COUNT(distinct_$column.$column) > 1)
+  THEN 1 ELSE 0 END
+  FROM (SELECT DISTINCT $table.$column FROM $table) AS distinct_$column
+distinct_less_than_count: >
+  SELECT CASE WHEN
+                  (COUNT(distinct_$column.$column) < $source_row_count)
+  THEN 1 ELSE 0 END
+  FROM (SELECT DISTINCT $table.$column FROM $table)
+  AS distinct_$column
+no_empty_rows: >
+  SELECT CASE WHEN
+                  count(*) = 0
+  THEN 1 ELSE 0 END
+  FROM $table
+  WHERE $table.$column is NULL OR $table.$column = ''
+no_nans: >
+  SELECT CASE WHEN
+                  count(*) = 0
+  THEN 1 ELSE 0 END
+  FROM $table
+  WHERE $table.$column = 'NaN'
+no_null_rows: >               # for column types that will fail string comparison (e.g. timestamp)
+  SELECT CASE WHEN
+                  count(*) = 0
+  THEN 1 ELSE 0 END
+  FROM $table
+  WHERE $table.$column is NULL
+no_zero_epoch_time: >
+  SELECT CASE WHEN
+                  count(*) = 0
+  THEN 1 ELSE 0 END
+  FROM $table
+  WHERE $table.$column = to_timestamp('1970-01-01', 'YYYY-MM-DD')
+nonzero_sum: >
+  SELECT CASE WHEN
+                  sum($table.$column) > 0
+  THEN 1 ELSE 0 END
+  FROM $table
+not_all_empty:
+  SELECT CASE WHEN
+                  COUNT(*) > (SELECT COUNT(*)
+                              FROM $table
+                              WHERE $table.$column = '')
+  THEN 1 ELSE 0 END
+  FROM $table
+not_all_zero:
+  SELECT CASE WHEN
+                  COUNT(*) > (SELECT COUNT(*)
+                              FROM $table
+                              WHERE $table.$column = 0)
+  THEN 1 ELSE 0 END
+  FROM $table
+not_numeric: >
+  SELECT CASE WHEN
+                  COUNT($table.$column) = 0
+  THEN 1 ELSE 0 END
+  FROM $table
+  WHERE $table.$column ~ '^[0-9]+$'
+reasonably_distributed_lengths: >     # checks that avg -/+ 1 stddev >/< min/max
+  SELECT CASE WHEN
+              (min(length($table.$column)) < (avg(length($table.$column)) - stddev(length($table.$column)))) AND
+              (max(length($table.$column)) > (avg(length($table.$column)) + stddev(length($table.$column))))
+  THEN 1 ELSE 0 END
+  FROM $table
+reasonably_distributed_values: >      # checks that avg -/+ 1 stddev >/< min/max
+  SELECT CASE WHEN
+              (min($table.$column) < (avg($table.$column) - stddev($table.$column))) AND
+              (max($table.$column) > (avg($table.$column) + stddev($table.$column)))
+  THEN 1 ELSE 0 END
+  FROM $table
+some_empty_rows: >
+  SELECT CASE WHEN
+                  (0 < count(*)) AND
+                  (count(*) < $source_row_count)
+  THEN 1 ELSE 0 END
+  FROM $table
+  WHERE $table.$column is NULL OR $table.$column = ''
+varied_lengths: >
+  SELECT CASE WHEN
+                  ((MAX(char_length($table.$column)) - MIN(char_length($table.$column))) > 0) AND
+                  (MAX(char_length($table.$column)) <> MIN(char_length($table.$column)))
+  THEN 1 ELSE 0 END
+  FROM $table
+varied_times: >
+  SELECT CASE WHEN
+                  (MAX($table.$column) - MIN($table.$column)) > 0
+  THEN 1 ELSE 0 END
+  FROM $table
+varied_values: >
+  SELECT CASE WHEN
+                  ((MAX($table.$column) - MIN($table.$column)) > 0) AND
+                  (MIN($table.$column) < AVG($table.$column)) AND
+                  (MAX($table.$column) > AVG($table.$column))
+  THEN 1 ELSE 0 END
+  FROM $table
