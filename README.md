@@ -194,3 +194,7 @@ did the existing tests kill a mutant missed by this framework. Feel free
 to try adapting this approach to your own data warehouse. It should work
 in any language with decent testing support.
 
+## What's with the repo name?
+
+GitHubt suggested it and I thought sure, that sounds fun.
+
